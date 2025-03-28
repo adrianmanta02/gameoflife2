@@ -139,7 +139,7 @@ void make_changes(char **frame, const frame_change *array, int index)
 //---------------------------------------------------------------------------------------------------------------------------------
 int main(int argc, const char *argv[])
 {
-    char **frame; int variable; 
+    char **frame;
     int task, lines, columns, generations, i, j, k, index;
     frame_change *array = NULL;
 
