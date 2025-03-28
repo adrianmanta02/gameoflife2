@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animatie Grid</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <label for="mode">Mod de lucru:</label>
+        <select id="mode">
+            <option value="auto">Auto</option>
+            <option value="custom">Custom</option>
+        </select>
+        
+        <input type="file" id="fileRef" accept=".out">
+        <input type="file" id="fileInput" accept=".out">
+        <button id="start">Start</button>
+        <button id="pause">Pauza</button>
+        <button id="reset">Reset</button>
+        
+        <div id="customOptions" style="display: none;">
+            <input type="number" id="generations" placeholder="Numar generatii">
+            <input type="number" id="speed" placeholder="Viteza tranzitie (s)" step="0.1" value="0.5">
+        </div>
+        <div id="generationInfo">
+            Numarul generatiei:
+        </div>
+        <div id="numGen">0</div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="left-side" id="leftSide">
+                <!-- Grid pentru fisierul referinta -->
+            </div>
+            <div class="right-side" id="rightSide">
+                <!-- Grid pentru fisierul animatie -->
+            </div>
+        </div>
+    </main>
+    
+    <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+	"source_path": "./",
+	"executable_path": "./task1",
+	"input_path": "./project-data-main/gameoflife/InputData",
+	"output_path": "./out",
+	"ref_path": "./project-data-main/gameoflife/RefData",
+	"forward_path": "./forward",
+	"run_valgrind": true,
+	"tutorial": false
+}
