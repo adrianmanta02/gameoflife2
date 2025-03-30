@@ -29,7 +29,7 @@ stack;
 // Funtion to verify if the text file opens correctly. 
 void verify_opening(const FILE *file, const char *filename)
 {
-    if(file == NULL)
+    if (file == NULL)
     {
         printf("Error while trying to open the file %s\n", filename);
         exit(1); 
@@ -41,7 +41,7 @@ void add_list(list **head, int current_line, int current_column)
 {
     list *current;
     list *new_pair = (list *)malloc(sizeof(list));  // Memory allocation for a new node.
-    if(new_pair == NULL)
+    if (new_pair == NULL)
     {
         printf("Error while trying to allocate memory to new entry in list!\n"); 
         exit(1); 
@@ -51,14 +51,14 @@ void add_list(list **head, int current_line, int current_column)
     new_pair -> c = current_column;
     new_pair -> next = NULL;
 
-    if(*head == NULL) // It is the first element in the list, therefore is the head of it. 
+    if (*head == NULL) // It is the first element in the list, therefore is the head of it. 
     {
         *head = new_pair; 
     }
     else
     {   
         current = *head;
-        while(current -> next != NULL) // "Looping" through the list to find the ending.
+        while (current -> next != NULL) // "Looping" through the list to find the ending.
         {
             current = current -> next; 
         }
@@ -71,7 +71,7 @@ void display_list(list *head, FILE *file)
 {
     list *current = head; 
  
-    while(current != NULL)
+    while (current != NULL)
     { 
         // Avoiding to print a space at the final of a row. 
         if (current -> next == NULL)
@@ -109,7 +109,6 @@ void add_stack(stack **StackHead, list *head)
     {
         current = current -> next; 
     }
-
     current -> next = newStackNode;
 }
 
@@ -134,7 +133,7 @@ void read_frame(FILE *file, char **frame, int lines, int columns)
     int counter = 0; // Count each element while looping in the file. 
     char state; 
 
-    while(counter < lines*columns)
+    while (counter < lines*columns)
     {
         fscanf(file, " %c", &state); 
         frame[counter / columns][counter % columns] = state; // change the rows and columns when needed. 
@@ -151,33 +150,33 @@ void check_around(char **frame, int lines, int columns, int current_line, int cu
     current_cell = frame[current_line][current_column]; 
     
     // Each current cell has a 'border' around (there are max. 8 neighbours). 
-    for(i = current_line - 1; i <= current_line + 1; i++)
+    for (i = current_line - 1; i <= current_line + 1; i++)
     {
-        for(j = current_column - 1; j <= current_column + 1; j++)
+        for (j = current_column - 1; j <= current_column + 1; j++)
         {
             if (i >= 0 && i < lines && j >= 0 && j < columns) // Check if the limits of the frame are not surpassed. 
             {
                 // Count dead/alive cells around. 
-                if(frame[i][j] == ALIVE) count_alive++; 
-                else if(frame[i][j] == DEAD) count_dead++;
+                if (frame[i][j] == ALIVE) count_alive++; 
+                else if (frame[i][j] == DEAD) count_dead++;
             }  
         }
     }
 
-    if(current_cell == ALIVE)
+    if (current_cell == ALIVE)
     {
         count_alive --; // Substract one from alives, because it counted the current cell too. 
-        if(count_alive < 2 || count_alive > 3) 
+        if (count_alive < 2 || count_alive > 3) 
         {
             // This cell should die due to underpopulation (when it has less than 2 neighbours) or due to overpopulation (more than 3 neighbours).
-            add_list(head, current_line, current_column); // Changed state -> add to the list.           
+            add_list(head, current_line, current_column); // Changed state --> add to the list.           
         } 
     }
 
-    else if(current_cell == DEAD && count_alive == 3)
+    else if (current_cell == DEAD && count_alive == 3)
     { 
         // This dead cell should revive.
-        add_list(head, current_line, current_column); // Changed state -> add to the list. 
+        add_list(head, current_line, current_column); // Changed state --> add to the list. 
     }
 }
 
@@ -186,7 +185,7 @@ void make_changes(char **frame, list **head)
 {
     list *current = *head; 
 
-    while(current != NULL)
+    while (current != NULL)
     {
         int line = current -> l; 
         int column = current -> c; 
@@ -219,7 +218,7 @@ void free_list(list *head)
 
 void free_stack_memory(stack **StackHead, list *head)
 { 
-    if(StackHead == NULL)
+    if (StackHead == NULL)
     {
         return ; // Already empty. 
     }   
@@ -251,12 +250,12 @@ int main(int argc, char *argv[])
     
     // Memory allocation for the frame. 
     frame = (char **)malloc(lines * sizeof(char*)); 
-    if(frame == NULL)
+    if (frame == NULL)
     {
         printf("Error while trying to allocate memory for lines!\n"); 
         exit(1);
     }
-    for(i = 0; i < lines; i++)
+    for (i = 0; i < lines; i++)
     {
         *(frame + i) = (char *)malloc(columns * sizeof(char)); 
         if (frame[i] == NULL)
@@ -270,13 +269,13 @@ int main(int argc, char *argv[])
     read_frame(file, frame, lines, columns); 
     fclose(file);
      
-    for(k = 0; k < generations; k++)
+    for (k = 0; k < generations; k++)
     {
         head = NULL; // For each generation, there will be different lists. 
         // Checking around any cell
-        for(i = 0 ; i < lines; i++)
+        for (i = 0 ; i < lines; i++)
         {
-            for(j = 0; j < columns; j++)
+            for (j = 0; j < columns; j++)
             {  
                 check_around(frame, lines, columns, i, j, &head);
             }
@@ -294,7 +293,7 @@ int main(int argc, char *argv[])
     fclose(file); 
 
     // Free memory for the frame and the stack(as well as the nodes in the stack). 
-    for(i = 0; i < lines; i++)
+    for (i = 0; i < lines; i++)
     {
         free(frame[i]); 
     }
