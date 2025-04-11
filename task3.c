@@ -83,6 +83,7 @@ void display_list(list *head, FILE *file)
     }
     fprintf(file, "\n");
 }
+
 void free_list(list *head) 
 {
     while (head != NULL) 
@@ -199,14 +200,14 @@ void checkAroundNewRule(char **frame, int lines, int columns, int current_line, 
 }
 
 // Function for applying changes after checking around for each cell.
-void make_changes(char **frame, list **head)
+void make_changes(char **frame, list *head)
 {
-    list *current = *head;
+    list *current = head;
 
     while (current != NULL)
     {
         int line = current->l;
-        int column = current->c;
+        int column = current->c; 
 
         // Change the state for each cell that was identified in the check_around function
         if (frame[line][column] == DEAD)
@@ -223,6 +224,7 @@ void make_changes(char **frame, list **head)
 
 TreeNode *createTreeNode(list *head)
 {
+    // Memory allocation for a tree node. 
     TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
     if (newNode == NULL)
     {
@@ -232,6 +234,8 @@ TreeNode *createTreeNode(list *head)
 
     newNode->right = NULL;
     newNode->left = NULL;
+
+    //Assigning information to node's field
     newNode->headList = head;
     return newNode;
 }
@@ -290,20 +294,60 @@ char** cloneMatrix(char **mainFrame, int lines, int columns)
     }
     return copiedFrame;
 }
+
+void restoreChanges(char **frame, char **modifiedFrame, int lines, int columns)
+{
+    for (int i = 0; i < lines; i++)
+    {
+        for (int j = 0; j < columns; j++)
+        {
+            frame[i][j] = modifiedFrame[i][j]; 
+        }
+    }
+}
+
+void resetFrame(char **frame, int lines, int columns)
+{
+    for (int i = 0; i < lines; i++)
+    {
+        for (int j = 0; j < columns; j++)
+        {
+            frame[i][j] = DEAD;
+        }
+    }
+}
+
+// Function to create a frame using the coordinates stored in a list. 
+void createFrameUsingCoord(char **frame, int lines, int columns, list *head)
+{
+    list *current = head;
+ 
+    resetFrame(frame, lines, columns); 
+    while (current != NULL)
+    {
+        int listLine = current->l;
+        int listColumn = current->c;
+        if (listLine >= 0 && listLine < lines && listColumn >= 0 && listColumn < columns)
+            frame[listLine][listColumn] = ALIVE;
+        current = current->next;
+    }
+}
+
+
 void TreeBuilder(TreeNode *root, char **tempFrame, int lines, int columns, int level, int generations, FILE *file)
 {
-    if (root == NULL || level > generations)
+    if (root == NULL || level >= generations)
     {
         return; 
     } 
 
+    // If not at the root level, apply the changes according to the coordinates in the list. 
     if (level != 0)
     {
-        make_changes(tempFrame, &root->headList); 
+        make_changes(tempFrame, root->headList); 
     }
 
-    display_frame_in_file(tempFrame, lines, columns, file); 
-
+    // Initialization for each tree node's usable information
     list *headNew = NULL; 
     list *headOld = NULL; 
 
@@ -311,13 +355,13 @@ void TreeBuilder(TreeNode *root, char **tempFrame, int lines, int columns, int l
     {
         for (int j = 0; j < columns; j++)
         {
+            // Creating both lists, depending on the rules.
             checkAroundNewRule(tempFrame, lines, columns, i, j, &headNew); 
             checkAroundOldRule(tempFrame, lines, columns, i, j, &headOld); 
         }
     } 
 
-    char **leftFrame = cloneMatrix(tempFrame, lines, columns);
-    char **rightFrame = cloneMatrix(tempFrame, lines, columns);
+    char **backupFrame = cloneMatrix(tempFrame, lines, columns);
 
     TreeNode *leftNode = createTreeNode(headNew);
     TreeNode *rightNode = createTreeNode(headOld);
@@ -325,11 +369,32 @@ void TreeBuilder(TreeNode *root, char **tempFrame, int lines, int columns, int l
     root->left = leftNode; 
     root->right = rightNode;
 
-    TreeBuilder(root->left, leftFrame, lines, columns, level + 1, generations, file); 
-    TreeBuilder(root->right, rightFrame, lines, columns, level + 1, generations, file);
+    TreeBuilder(root->left, tempFrame, lines, columns, level + 1, generations, file);
+    restoreChanges(tempFrame, backupFrame, lines, columns); 
+    TreeBuilder(root->right, tempFrame, lines, columns, level + 1, generations, file);
 
-    freeFrameMem(&leftFrame, lines);
-    freeFrameMem(&rightFrame, lines);
+    freeFrameMem(&backupFrame, lines);
+}
+
+void preOrder(TreeNode *root, char **frame, int lines, int columns, int level, FILE *file)
+{
+    if (root == NULL)
+    {
+        return ; 
+    }
+
+    if (level != 0)
+        make_changes(frame, root -> headList); 
+
+    display_frame_in_file(frame, lines, columns, file); 
+        
+    char **backupFrame = cloneMatrix(frame, lines, columns); 
+    
+    preOrder(root -> left, frame, lines, columns, level + 1, file); 
+    restoreChanges(frame, backupFrame, lines, columns); 
+    preOrder(root -> right, frame, lines, columns, level + 1, file); 
+
+    freeFrameMem(&backupFrame, lines);  
 }
 
 int main(int argc, char *argv[])
@@ -369,8 +434,11 @@ int main(int argc, char *argv[])
         verify_opening(file, argv[2]);
         
         TreeNode *root = createTreeNode(initialListHead);
-
         TreeBuilder(root, frame, lines, columns, 0, generations, file); 
+        
+        createFrameUsingCoord(frame, lines, columns, initialListHead); 
+
+        preOrder(root, frame, lines, columns, 0, file); 
         freeTree(root); 
         
         fclose(file); 
