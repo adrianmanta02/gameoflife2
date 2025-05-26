@@ -214,6 +214,48 @@ void createFrameUsingCoord(char **frame, int lines, int columns, listNode *head)
     }
 }
 
+// Completes a new generation using a reference frame.  
+void createNextGen(char **frame, char **nextframe, int lines, int columns)
+{
+    int count_alive, count_dead;
+    for (int i = 0; i < lines; i++)
+    {
+        for (int j = 0; j < columns; j++)
+        {
+            // get the number of dead & alive neighbours for each cell to decide its fate. 
+            count_alive = count_dead = 0;             
+            countNeigbours(frame, lines, columns, i, j, &count_alive, &count_dead);
+            
+            char current_cell = frame[i][j]; 
+            if (current_cell == ALIVE)
+            { 
+                if (count_alive < 2 || count_alive > 3)
+                {
+                    // This cell should die due to underpopulation (when it has less than 2 neighbours) 
+                    // or due to overpopulation (more than 3 neighbours).
+                    nextframe[i][j] = DEAD;
+                }
+                else nextframe[i][j] = current_cell; 
+            }
+            else 
+            {  
+                if (count_alive == 3)
+                {
+                    // This dead cell should revive.
+                    nextframe[i][j] = ALIVE;
+                }
+                else nextframe[i][j] = current_cell; 
+            }   
+        }
+    }
+}
+
+
+// ALTERNATIVE FOR TASK 1, USE AN ARRAY OF CELLS DEFINED BY A STRUCTURE (line, column, state) 
+// MAKE CHANGES ON THE FRAME BASED ON THE ITEMS STORED IN THE ARRAY. 
+
+/*
+
 // Useful for task1, adds a cell with its information in an array.  
 void addToArray(frame_change **array, int *index, int current_column, int current_line, char current_cell)
 {
@@ -268,3 +310,5 @@ void checkAroundViaArray(char **frame, int lines, int columns, int current_line,
         addToArray(array, index, current_column, current_line, current_cell); 
     }
 }
+
+*/ 

@@ -29,5 +29,6 @@ void createFrameUsingCoord(char **frame, int lines, int columns, listNode *head)
 void addToArray(frame_change **array, int *index, int current_column, int current_line, char current_cell); 
 void makeChangesViaArray(char **frame, const frame_change *array, int index);
 void checkAroundViaArray(char **frame, int lines, int columns, int current_line, int current_column, frame_change **array, int *index); 
+void createNextGen(char **frame, char **nextframe, int lines, int columns); 
 
 #endif // FRAME_H
