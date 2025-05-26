@@ -28,11 +28,14 @@ void readFrame(FILE *file, char **frame, int lines, int columns, listNode **obje
         fscanf(file, " %c", &state);
         if (state == ALIVE && toggle == true)
             addList(object, i, j); // Adding the alive cells' coordinates into the initial object list, useful for task3.
-        frame[i][j] = state;        // change the rows and columns when needed.
+        
+        if (state != '\n')
+            frame[i][j] = state;        // change the status of the selected cell
         counter++;
     }
 }
 
+// Displays the frame of a generation. 
 void displayFrame(char **frame, int lines, int columns, FILE *file)
 {
     int i, j;
@@ -45,7 +48,7 @@ void displayFrame(char **frame, int lines, int columns, FILE *file)
         }
         fprintf(file, "\n");
     }
-    fprintf(file, "\n");
+    fprintf(file, "\n"); 
 }
 
 // Takes each element in the frame to check info about its neighbours.
@@ -92,7 +95,8 @@ void checkAroundOldRule(char **frame, int lines, int columns, int current_line, 
     {
         if (count_alive < 2 || count_alive > 3)
         {
-            // This cell should die due to underpopulation (when it has less than 2 neighbours) or due to overpopulation (more than 3 neighbours).
+            // This cell should die due to underpopulation (when it has less than 2 neighbours)
+            // or due to overpopulation (more than 3 neighbours).
             addList(head, current_line, current_column); // Changed state --> add to the list.
         }
     }
@@ -139,8 +143,7 @@ void makeChanges(char **frame, listNode *head)
         {
             frame[line][column] = DEAD; 
         }
-
-        current = current -> next; // Go to the next cell in the list. 
+        current = current -> next; // Go to the next cell in the list.
     }
 }
 
@@ -171,6 +174,7 @@ char** cloneMatrix(char **mainFrame, int lines, int columns)
     return copiedFrame;
 }
 
+// Brings a frame back to a certain configuration. 
 void restoreChanges(char **frame, char **modifiedFrame, int lines, int columns)
 {
     for (int i = 0; i < lines; i++)
@@ -182,6 +186,7 @@ void restoreChanges(char **frame, char **modifiedFrame, int lines, int columns)
     }
 }
 
+// Marks all cells as being DEAD.
 void resetFrame(char **frame, int lines, int columns)
 {
     for (int i = 0; i < lines; i++)
@@ -193,7 +198,7 @@ void resetFrame(char **frame, int lines, int columns)
     }
 }
 
-// Function to create a frame using the coordinates stored in a list. 
+// Function which creates a frame using the coordinates stored in a list. 
 void createFrameUsingCoord(char **frame, int lines, int columns, listNode *head)
 {
     listNode *current = head;
@@ -209,13 +214,13 @@ void createFrameUsingCoord(char **frame, int lines, int columns, listNode *head)
     }
 }
 
-// Useful for task1 
+// Useful for task1, adds a cell with its information in an array.  
 void addToArray(frame_change **array, int *index, int current_column, int current_line, char current_cell)
 {
     *array = (frame_change *)realloc(*array, (*index + 1) * sizeof(frame_change)); 
     if (*array == NULL)
     {
-        printf("Error while trying to allocate memory to the array in function addToArray!\n");
+            printf("Error while trying to allocate memory to the array in function addToArray!\n");
         exit(1); 
     }
 

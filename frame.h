@@ -20,7 +20,7 @@ void displayFrame(char **frame, int lines, int columns, FILE *file);
 void countNeigbours(char **frame, int lines, int columns, int current_line, int current_column, int *count_alive, int *count_dead);
 void checkAroundOldRule(char **frame, int lines, int columns, int current_line, int current_column, listNode **head); 
 void checkAroundNewRule(char **frame, int lines, int columns, int current_line, int current_column, listNode **head);
-void makeChanges(char **frame, listNode *head); 
+void makeChanges(char **frame, listNode *head);
 void freeFrameMem(char ***frame, int lines); 
 char** cloneMatrix(char **mainFrame, int lines, int columns); 
 void restoreChanges(char **frame, char **modifiedFrame, int lines, int columns); 

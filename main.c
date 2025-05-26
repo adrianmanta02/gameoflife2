@@ -109,6 +109,8 @@ int main(int argc, const char *argv[])
                 makeChanges(frame, head);    
             }
             displayStack(StackHead, file);
+            freeStackMem(&StackHead);
+            fclose(file); 
             break; 
         }
 
@@ -132,13 +134,42 @@ int main(int argc, const char *argv[])
             break; 
         }
 
+        case 4:
+        {
+            // Reading the frame from the file
+            readFrame(file, frame, lines, columns, &initialListHead, true);
+            fclose(file);
+
+            file = fopen(argv[2], "wt");
+            verifyOpening(file, argv[2]);
+            
+            TreeNode *root = createTreeNode(initialListHead);
+            TreeBuilder(root, frame, lines, columns, 0, generations);
+            
+            createFrameUsingCoord(frame, lines, columns, initialListHead); 
+            Hamilton4Nodes(root, frame, lines, columns, 0, file); 
+            
+            freeTree(root); 
+            break;
+        }
+        case 5: 
+        {
+            readFrame(file, frame, lines, columns, &initialListHead, false); 
+            stackNode *stackHead = getStackGenerations(file); 
+            fclose(file); 
+
+            file = fopen(argv[2], "wt"); 
+            verifyOpening(file, argv[2]); 
+        
+            generateInitialFrame(stackHead, frame, lines, columns, file); 
+            break; 
+        }
         default:
         {
             freeFrameMem(&frame, lines);
-            printf("Invalid task number!\n"); 
-            exit(1); 
+            fclose(file);
+            break; 
         }
     }
     freeFrameMem(&frame, lines);
-    fclose(file);
 }

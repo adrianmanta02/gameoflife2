@@ -3,6 +3,7 @@
 
 #include "coordlist.h"
 #include "frame.h"
+#include "graph.h"
 
 typedef struct TreeNode
 {
@@ -16,5 +17,7 @@ int treeHeight(TreeNode *root);
 void freeTree(TreeNode *root); 
 void TreeBuilder(TreeNode *root, char **tempFrame, int lines, int columns, int level, int generations); 
 void preOrder(TreeNode *root, char **frame, int lines, int columns, int level, FILE *file); 
+void printLevel(TreeNode *root, int level, FILE *file); 
+void Hamilton4Nodes(TreeNode *root, char **tempFrame, int lines, int columns, int level, FILE *file);
 
 #endif // TREE_H

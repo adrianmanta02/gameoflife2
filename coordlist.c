@@ -1,4 +1,5 @@
 #include "coordlist.h"
+#define ALIVE 'X'
 
 // This function adds (line, column) for the cell that is chaniging state into a list. 
 void addList(listNode **head, int current_line, int current_column)
@@ -41,12 +42,16 @@ void displayList(listNode *head, FILE *file)
     { 
         // Avoiding to print a space at the final of a row. 
         if (current -> next == NULL)
-            fprintf(file, "%d %d", current -> l, current ->c);
+        { 
+            fprintf(file, "%d %d", current -> l, current -> c); 
+        }        
         else
-            fprintf(file, "%d %d ", current->l, current->c);  
+        {
+            fprintf(file, "%d %d ", current->l, current->c); 
+        }
         current = current -> next; 
     }
-    fprintf(file, "\n"); 
+    fprintf(file, "\n");
 } 
 
 void freeList(listNode **head)
@@ -59,4 +64,42 @@ void freeList(listNode **head)
         free(temporary); 
     }
     *head = NULL;
+}
+
+// Checks if a certain cell is placed around a certain selected cell. 
+bool isAround(int current_line, int current_column, int line_to_check, int column_to_check)
+{
+    bool answer = false; 
+    if (line_to_check == current_line - 1 || line_to_check == current_line || line_to_check == current_line + 1)
+        if (column_to_check == current_column - 1 || column_to_check == current_column || 
+            column_to_check == current_column + 1)
+            answer = true; 
+    return answer; 
+}
+
+// Returns an array of list nodes that mark the alive cells in the frame. 
+listNode** getAliveCells(char **frame, int lines, int columns, int *aliveCount)
+{
+    *aliveCount = 0; 
+    listNode **aliveNodes = (listNode **)malloc(lines * columns * sizeof(listNode *));
+    if (aliveNodes == NULL)
+    {
+        printf("Error while trying to allocate memory for the array of alive cells' coordinates.\n"); 
+        exit(1); 
+    }
+    
+    for (int i = 0; i < lines; i++) 
+    {
+        for (int j = 0; j < columns; j++) 
+        {
+            if (frame[i][j] == ALIVE) 
+            {
+                aliveNodes[*aliveCount] = (listNode *)malloc(sizeof(listNode));
+                aliveNodes[*aliveCount]->l = i;
+                aliveNodes[*aliveCount]->c = j;
+                (*aliveCount)++;
+            }
+        }
+    }
+    return aliveNodes;
 }
