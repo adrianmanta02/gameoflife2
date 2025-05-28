@@ -1,1 +1,1 @@
-==2467== error calling PR_SET_PTRACER, vgdb might block
+==26672== error calling PR_SET_PTRACER, vgdb might block

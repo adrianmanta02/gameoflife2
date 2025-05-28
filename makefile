@@ -10,3 +10,4 @@ bonus:
 	./main ./bonus_in/databonus10.in ./bonus_out/databonus10.out
 clear:
 	rm -rf main
+	
