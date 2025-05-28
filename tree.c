@@ -158,7 +158,7 @@ void Hamilton4Nodes(TreeNode *root, char **tempFrame, int lines, int columns, in
 
     // get the hamiltonian path 
     int pathLen = 0; 
-    int *path = longestHamiltonianInGraph(g, components, componentCount, &pathLen);
+    int *path = longestHamiltonianInGraph(g, components, componentCount, &pathLen, aliveNodes);
 
     printHamiltonianPath(path, pathLen, aliveNodes, file); 
     

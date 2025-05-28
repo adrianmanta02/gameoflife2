@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "frame.h"
+#include <limits.h>
 
 // Creates a graph using the alive cells in the frame. 
 Graph *createGraph(char **frame, int lines, int columns, listNode **array, int index)
@@ -109,6 +110,7 @@ bool buildHamiltonianPath(Graph *g, int *path, int depth, int currentNode, int *
     return false;
 }
 
+// Returns a Hamiltonian path found in a connected component of a graph. 
 int *findPathInComponent(Graph *g, connection component) 
 {
     int *visited = calloc(g->V, sizeof(int));
@@ -141,7 +143,20 @@ int *findPathInComponent(Graph *g, connection component)
     return NULL; 
 }
 
-int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents, int componentsNumber, int *pathLen)
+// Reverts a hamiltonian path of node numbers. 
+void reversePath(int *path, int pathLen)
+{
+    for (int i = 0; i < pathLen / 2; i++)
+    {
+        int temp = path[i];
+        path[i] = path[pathLen - 1 - i];
+        path[pathLen - 1 - i] = temp;
+    }
+}
+
+// returns the longest hamiltonian path in a graph. 
+int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents,
+             int componentsNumber, int *pathLen, listNode **aliveNodes)
 {
     int *path =  NULL;  
     *pathLen = 0;
@@ -153,6 +168,14 @@ int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents, int co
         if (path != NULL) // there is a valid Hamiltonian path
         {
             *pathLen = connectedComponents[i].compLength; 
+
+            int startingLine = aliveNodes[path[0]]->l;
+            int endingLine = aliveNodes[path[*pathLen - 1]]->l;
+
+            // the path may be flipped up, reverse the order.
+            if (startingLine > endingLine)
+                reversePath(path, *pathLen);
+
             break;
         }  
     }   
@@ -180,6 +203,7 @@ void sortComponents(connection *components, int componentsNumber)
     }
 }
 
+// Prints the Hamiltonian path after doing a match between the int format and (l,c) using the nodes marked as alive.  
 void printHamiltonianPath(const int *path, int pathLength, listNode** aliveNodes, FILE *file)
 {
     if (path == NULL)
@@ -192,10 +216,100 @@ void printHamiltonianPath(const int *path, int pathLength, listNode** aliveNodes
         for (int i = 0; i < pathLength; i++)
         {
             if (i == 0)
+            {
                 fprintf(file, "(%d,%d)", aliveNodes[path[i]]->l, aliveNodes[path[i]]->c);
+            }
             else
+            {
                 fprintf(file, " (%d,%d)", aliveNodes[path[i]]->l, aliveNodes[path[i]]->c);
+            }
         }
         fprintf(file, "\n");
     }
 }
+
+// int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents,
+//              int componentsNumber, int *pathLen, listNode **aliveNodes)
+// {
+//     int *path = NULL, *finalPath = NULL;
+//     int startingLine, endingLine, index = 0, maxLen = INT_MIN, minLine = INT_MAX, minCol = INT_MAX;
+//     *pathLen = 0;
+
+//     // used an array of paths, since there could be multiple paths having the same length.
+//     connection *arrayPath = (connection *)malloc(componentsNumber * sizeof(connection));
+
+//     // loop through each (sorted) connected components
+//     for (int i = 0; i < componentsNumber; i++)
+//     {
+//         path = findPathInComponent(g, connectedComponents[i]);
+//         if (path != NULL) // there is a valid Hamiltonian path
+//         {
+//             int localLen = connectedComponents[i].compLength;
+
+//             // select only the paths that have the maximum length for further comparison.
+//             if (localLen >= maxLen)
+//             {
+//                 maxLen = localLen;
+//                 arrayPath[index].compVertices = malloc(localLen * sizeof(int));
+
+//                 // copy the path into the array field.
+//                 memcpy(arrayPath[index].compVertices, path, localLen * sizeof(int));
+//                 arrayPath[index].compLength = localLen;
+
+//                 index++;
+//             }
+//             free(path);
+//         }
+//     }
+
+//     // no valid paths found. 
+//     if (index == 0) 
+//     {
+//         free(arrayPath);
+//         *pathLen = 0;
+//         return NULL;
+//     }
+
+//     finalPath = (int *)malloc(maxLen * sizeof(int));
+//     if (finalPath == NULL)
+//     {
+//         printf("Error while trying to allocate memory for the final path!\n"); 
+//         exit(1);
+//     }
+
+//     // Search through the equally-sized ones. 
+//     for (int i = 0; i < index; i++)
+//     {
+//         if (arrayPath[i].compLength == maxLen)
+//         {
+//             // obtain each path's starting node's line and column
+//             startingLine = aliveNodes[arrayPath[i].compVertices[0]]->l;
+//             int startingColumn  = aliveNodes[arrayPath[i].compVertices[0]]->c;
+
+//             // the paths that are starting from the most upper and left side of the frame are the ones we need
+//             if (startingLine < minLine || (startingLine == minLine && startingColumn < minCol))
+//             {
+//                 minLine = startingLine;
+//                 minCol = startingColumn;
+
+//                 memcpy(finalPath, arrayPath[i].compVertices, maxLen * sizeof(int));
+
+//                 startingLine = aliveNodes[finalPath[0]]->l;
+//                 endingLine = aliveNodes[finalPath[maxLen - 1]]->l;
+
+//                 // the path may be flipped up, reverse the order.
+//                 if (startingLine > endingLine)
+//                     reversePath(finalPath, maxLen);
+//             }
+//         }
+//     }
+
+//     for (int i = 0; i < index; i++)
+//     {
+//         free(arrayPath[i].compVertices);
+//     }
+//     free(arrayPath);
+
+//     *pathLen = maxLen;
+//     return finalPath;
+// }

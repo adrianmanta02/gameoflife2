@@ -18,7 +18,8 @@ typedef struct
 }
 connection;
 
-int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents, int componentsNumber, int *pathLen);
+int* longestHamiltonianInGraph(Graph *g, connection *connectedComponents,
+             int componentsNumber, int *pathLen, listNode **aliveNodes);
 int *findPathInComponent(Graph *g, connection component);
 bool buildHamiltonianPath(Graph *g, int *path, int depth, int currentNode, int *visited, int targetLength);
 connection* DFS (Graph *g, int *componentNumber);
